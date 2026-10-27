@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Canva Design Copier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #090c15;
+      --card-bg: rgba(16, 22, 38, 0.82);
+      --card-border: rgba(56, 189, 248, 0.22);
+      --card-border-glow: rgba(168, 85, 247, 0.3);
+      --text-primary: #ffffff;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --cyan-neon: #00d2ff;
+      --cyan-bright: #38bdf8;
+      --purple-neon: #a855f7;
+      --purple-light: #c084fc;
+      --cyan-glow: rgba(0, 210, 255, 0.35);
+      --purple-glow: rgba(168, 85, 247, 0.45);
+      --grad-cyan-purple: linear-gradient(135deg, #00d2ff 0%, #9333ea 100%);
+      --grad-neon-surface: linear-gradient(135deg, rgba(0, 210, 255, 0.12) 0%, rgba(168, 85, 247, 0.16) 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 410px;
+      min-height: 590px;
+      max-height: 600px;
+      margin: 0;
+      padding: 12px;
+      background: radial-gradient(circle at 85% 12%, rgba(147, 51, 234, 0.22) 0%, transparent 40%),
+                  radial-gradient(circle at 10% 48%, rgba(6, 182, 212, 0.16) 0%, transparent 35%),
+                  radial-gradient(circle at 50% 90%, rgba(124, 58, 237, 0.14) 0%, transparent 40%),
+                  var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 13px;
+      line-height: 1.4;
+      user-select: none;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    body::-webkit-scrollbar {
+      width: 5px;
+    }
+    body::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.2);
+      border-radius: 999px;
+    }
+
+    /* Outer Precision Glass Shell */
+    .app-shell {
+      position: relative;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      background: rgba(11, 16, 29, 0.88);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.2),
+                  0 24px 48px -12px rgba(0, 0, 0, 0.85),
+                  0 0 40px rgba(0, 210, 255, 0.1);
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    /* Ambient Holographic Mascot Layer (Seamless in Background) */
+    .mascot-ambient-backdrop {
+      position: absolute;
+      top: -6px;
+      right: 4px;
+      width: 120px;
+      height: 120px;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.92;
+      filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.45)) drop-shadow(0 0 12px rgba(0, 210, 255, 0.4));
+      animation: ambientHover 4.5s ease-in-out infinite;
+    }
+
+    .mascot-ambient-backdrop img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: top center;
+    }
+
+    @keyframes ambientHover {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-4px) scale(1.02); }
+    }
+
+    /* Title Bar */
+    .title-bar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .window-controls {
+      display: flex;
+      align-items: center;
+      gap: 6.5px;
+    }
+
+    .window-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-close { background: #ff5f56; }
+    .dot-minimize { background: #ffbd2e; }
+    .dot-zoom { background: #27c93f; }
+
+    .brand-mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00c4cc 0%, #7d2ae8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px rgba(0, 196, 204, 0.5);
+    }
+    .brand-mark span {
+      font-size: 12px;
+      font-weight: 800;
+      font-style: italic;
+      color: #ffffff;
+      line-height: 1;
+    }
+
+    /* Hero Header */
+    .hero-panel {
+      position: relative;
+      z-index: 2;
+      margin-bottom: 14px;
+      padding-right: 110px; /* Leave breathing space for floating mascot */
+    }
+
+    .hero-h1 {
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      line-height: 1.15;
+    }
+
+    .text-canva {
+      color: var(--cyan-neon);
+      text-shadow: 0 0 18px rgba(0, 210, 255, 0.55);
+    }
+
+    .text-copier {
+      color: #ffffff;
+    }
+
+    .hero-sub {
+      margin-top: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.1px;
+    }
+
+    /* Reusable Bento Glass Card */
+    .bento-card {
+      position: relative;
+      z-index: 2;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 11px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .bento-card:hover {
+      border-color: rgba(56, 189, 248, 0.35);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(0, 210, 255, 0.08);
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 9px;
+    }
+
+    .card-caption {
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      letter-spacing: 0.2px;
+    }
+
+    /* Workspace Selector Component */
+    .workspace-trigger {
+      width: 100%;
+      background: rgba(14, 20, 36, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .workspace-trigger:hover {
+      border-color: var(--cyan-neon);
+      background: rgba(18, 27, 48, 0.95);
+      box-shadow: 0 0 16px var(--cyan-glow);
+      transform: translateY(-1px);
+    }
+
+    .workspace-leading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .team-avatar-box {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00d2ff 0%, #7928ca 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      box-shadow: 0 2px 10px rgba(0, 210, 255, 0.4);
+    }
+
+    .team-avatar-box svg {
+      width: 15px;
+      height: 15px;
+      stroke: #ffffff;
+    }
+
+    .workspace-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .workspace-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #f1f5f9;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .workspace-badge-text {
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .chevron-icon {
+      width: 14px;
+      height: 14px;
+      stroke: #94a3b8;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+    }
+
+    /* Workspace Dropdown Panel */
+    .workspace-dropdown {
+      display: none;
+      margin-top: 8px;
+      background: rgba(9, 13, 24, 0.97);
+      border: 1px solid var(--card-border-glow);
+      border-radius: 12px;
+      padding: 6px;
+      max-height: 175px;
+      overflow-y: auto;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .workspace-dropdown.open {
+      display: block;
+      animation: popupSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes popupSlide {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .team-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12.5px;
+      color: #e2e8f0;
+      transition: all 0.15s ease;
+    }
+
+    .team-item-row:hover {
+      background: rgba(56, 189, 248, 0.14);
+      color: var(--cyan-bright);
+    }
+
+    .team-item-row.active {
+      background: rgba(168, 85, 247, 0.2);
+      color: var(--purple-light);
+      font-weight: 600;
+    }
+
+    .btn-switch-tab {
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-switch-tab:hover {
+      border-color: var(--cyan-neon);
+      color: #ffffff;
+      background: rgba(0, 210, 255, 0.2);
+    }
+
+    .btn-subtle-link {
+      background: none;
+      border: none;
+      color: var(--cyan-bright);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: opacity 0.15s ease;
+    }
+    .btn-subtle-link:hover {
+      opacity: 0.85;
+      text-decoration: underline;
+    }
+    .btn-subtle-link svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+    }
+
+    /* Designs Ready Header */
+    .designs-title-cluster {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .counter-pill {
+      background: rgba(6, 182, 212, 0.15);
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      color: var(--cyan-bright);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 999px;
+    }
+
+    .btn-scan-trigger {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--cyan-bright);
+      border-radius: 8px;
+      padding: 5px 11px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-scan-trigger:hover {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: var(--cyan-neon);
+      box-shadow: 0 0 14px var(--cyan-glow);
+      transform: translateY(-1px);
+    }
+
+    .btn-scan-trigger svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+    }
+
+    /* Design List Cards */
+    .design-grid-container {
+      max-height: 200px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 2px;
+      margin-bottom: 6px;
+    }
+
+    .design-grid-container::-webkit-scrollbar {
+      width: 4px;
+    }
+    .design-grid-container::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.25);
+      border-radius: 999px;
+    }
+
+    .design-item-card {
+      background: rgba(14, 20, 36, 0.65);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 12px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .design-item-card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(20, 28, 50, 0.75);
+      transform: translateY(-1.5px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-meta-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .checkbox-modern {
+      accent-color: var(--cyan-neon);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .thumbnail-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 9px;
+      object-fit: cover;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(168, 85, 247, 0.25));
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .thumbnail-box svg {
+      width: 20px;
+      height: 20px;
+      stroke: rgba(255, 255, 255, 0.6);
+    }
+
+    .design-title-col {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .design-h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .design-caption-sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Glow Button: Copy to Team */
+    .btn-action-glow {
+      background: var(--grad-neon-surface);
+      border: 1.5px solid var(--cyan-neon);
+      border-radius: 999px;
+      padding: 6px 14px;
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px var(--cyan-glow), inset 0 0 6px rgba(0, 210, 255, 0.2);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-action-glow:hover {
+      background: var(--grad-cyan-purple);
+      border-color: var(--purple-neon);
+      box-shadow: 0 0 18px var(--purple-glow);
+      transform: translateY(-1px);
+    }
+
+    .btn-action-glow:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Floating Progress Overlay Bar */
+    .progress-dock {
+      background: rgba(14, 20, 36, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.38);
+      border-radius: 14px;
+      padding: 10px 14px;
+      margin-bottom: 11px;
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 210, 255, 0.16);
+      display: none;
+    }
+
+    .progress-dock.visible {
+      display: block;
+      animation: popupSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .progress-status-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 7px;
+    }
+
+    .status-msg {
+      color: #f1f5f9;
+    }
+
+    .status-digits {
+      color: var(--cyan-bright);
+      font-weight: 700;
+    }
+
+    .track-outer {
+      width: 100%;
+      height: 7px;
+      background: rgba(30, 41, 59, 0.85);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .track-liquid {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #00d2ff 0%, #a855f7 100%);
+      border-radius: 999px;
+      box-shadow: 0 0 14px rgba(0, 210, 255, 0.7);
+      transition: width 0.3s ease;
+    }
+
+    /* Bottom Control Bar */
+    .footer-action-bar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .btn-primary-batch {
+      background: var(--grad-cyan-purple);
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 0 18px var(--purple-glow);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+    }
+
+    .btn-primary-batch:hover {
+      box-shadow: 0 0 24px var(--purple-glow), 0 0 14px var(--cyan-glow);
+      transform: translateY(-1.5px);
+    }
+
+    .btn-surface-secondary {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1.5px solid rgba(56, 189, 248, 0.35);
+      border-radius: 12px;
+      padding: 11px 14px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 14px rgba(0, 210, 255, 0.1);
+    }
+
+    .btn-surface-secondary:hover {
+      background: var(--grad-neon-surface);
+      border-color: var(--cyan-neon);
+      box-shadow: 0 0 18px var(--cyan-glow);
+      color: var(--cyan-bright);
+      transform: translateY(-1px);
+    }
+
+    .btn-surface-secondary svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+    }
+
+    .btn-icon-button {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1.5px solid rgba(148, 163, 184, 0.25);
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-icon-button:hover {
+      border-color: var(--purple-neon);
+      color: #ffffff;
+      box-shadow: 0 0 14px var(--purple-glow);
+      transform: translateY(-1px);
+    }
+
+    .btn-icon-button svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+    }
+
+    /* Settings Drawer */
+    .drawer-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 13, 24, 0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 18px;
+      z-index: 100;
+      flex-direction: column;
+      animation: popupSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .drawer-overlay.open {
+      display: flex;
+    }
+
+    .drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .drawer-heading {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .btn-close-x {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+    .btn-close-x:hover {
+      color: #ffffff;
+    }
+    .btn-close-x svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+    }
+
+    .field-block {
+      margin-bottom: 12px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      background: rgba(14, 20, 36, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 12.5px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    input[type="text"]:focus, select:focus {
+      border-color: var(--cyan-neon);
+      box-shadow: 0 0 12px var(--cyan-glow);
+    }
+
+    .terminal-box {
+      flex: 1;
+      background: #060913;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 10px;
+      padding: 9px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 11px;
+      color: #94a3b8;
+      overflow-y: auto;
+      max-height: 175px;
+      margin-top: 6px;
+    }
+
+    .log-line { margin-bottom: 4px; }
+    .log-success { color: #10b981; }
+    .log-warn { color: #f59e0b; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Ambient Mascot Hologram Seamlessly in Background -->
+    <div class="mascot-ambient-backdrop" title="AI Copier Active">
+      <img src="robot_mascot_transparent.png" alt="Canva Design Copier Mascot" />
+    </div>
+
+    <!-- Title Bar with Window Controls & Canva Ecosystem Badge -->
+    <div class="title-bar">
+      <div class="window-controls">
+        <div class="window-dot dot-close"></div>
+        <div class="window-dot dot-minimize"></div>
+        <div class="window-dot dot-zoom"></div>
+      </div>
+      <div class="brand-mark" title="Canva Portal Ecosystem">
+        <span>C</span>
+      </div>
+    </div>
+
+    <!-- Hero Header (Asymmetric, Clean 2-Line Architecture) -->
+    <div class="hero-panel">
+      <h1 class="hero-h1">
+        <span class="text-canva">Canva</span> <span class="text-copier">Design Copier</span>
+      </h1>
+      <p class="hero-sub">for Teams Portal</p>
+    </div>
+
+    <!-- Section 1: Team Workspace Selector -->
+    <div class="bento-card">
+      <div class="card-header-row">
+        <span class="card-caption">Team Workspace Selector</span>
+        <button id="detectTeamsBtn" class="btn-subtle-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          Refresh
+        </button>
+      </div>
+
+      <div class="workspace-trigger" id="workspaceSelectorBtn">
+        <div class="workspace-leading">
+          <div class="team-avatar-box" id="teamBadgeIcon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </div>
+          <div class="workspace-meta">
+            <span class="workspace-title" id="currentTeamDisplay">Design Team Alpha</span>
+            <span class="workspace-badge-text" id="currentRoleDisplay"></span>
+          </div>
+        </div>
+        <svg class="chevron-icon" id="chevronIcon" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+
+      <!-- Hidden Input for Target Team Name -->
+      <input type="hidden" id="targetTeamInput" value="" />
+
+      <!-- Interactive Dropdown of Detected Teams -->
+      <div class="workspace-dropdown" id="workspaceDropdownPanel">
+        <div id="teamListContainer">
+          <div style="color: var(--text-muted); text-align: center; padding: 12px; font-size: 11.5px;">
+            Scanning available teams...
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:6px;padding-top:6px;border-top:1px solid rgba(148,163,184,0.12);">
+          <span style="font-size:10px;color:var(--text-muted);margin-right:auto;">
+            Discovered: <strong id="teamCountSpan" style="color:var(--cyan-bright);">0</strong> verified teams
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Designs Ready Bento Card -->
+    <div class="bento-card">
+      <div class="card-header-row">
+        <div class="designs-title-cluster">
+          <span class="card-caption" style="margin:0;">Designs Ready</span>
+          <span class="counter-pill" id="countBadge">0 Designs</span>
+        </div>
+        <button id="scanBtn" class="btn-scan-trigger">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          Scan Designs
+        </button>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:0 2px;">
+        <label style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-secondary);cursor:pointer;">
+          <input type="checkbox" id="masterCheck" class="checkbox-modern" checked /> Select All
+        </label>
+        <span id="selectedCount" style="font-size:11px;color:var(--text-secondary);">0 selected</span>
+      </div>
+
+      <!-- Design List Items -->
+      <div class="design-grid-container" id="designList">
+        <div style="color: var(--text-muted); text-align: center; padding: 24px 10px; font-size: 11.5px;">
+          Open <strong>Canva Projects</strong> and click <strong>"Scan Designs"</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Real-Time Progress Dock -->
+    <div class="progress-dock" id="progressOverlay">
+      <div class="progress-status-header">
+        <span class="status-msg" id="progressStatusText">Copying 3 files...</span>
+        <span class="status-digits" id="progressPercentText">65%</span>
+      </div>
+      <div class="track-outer">
+        <div class="track-liquid" id="progressFill" style="width: 65%;"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Action Controls -->
+    <div class="footer-action-bar">
+      <button id="startCopyBtn" class="btn-primary-batch" title="Migrate all selected designs into target workspace">
+        Copy Selected
+      </button>
+      <button id="openProjectsBtn" class="btn-surface-secondary" title="Open Canva projects tab">
+        <span>View Team Assets</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="7" y1="17" x2="17" y2="7"></line>
+          <polyline points="7 7 17 7 17 17"></polyline>
+        </svg>
+      </button>
+      <button id="settingsBtn" class="btn-icon-button" title="Configure folder and settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Configuration & Live Console Drawer -->
+    <div class="drawer-overlay" id="drawerModal">
+      <div class="drawer-head">
+        <span class="drawer-heading">Migration Configuration</span>
+        <button id="closeDrawerBtn" class="btn-close-x" title="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Target Folder Name</label>
+        <input type="text" id="projectNameInput" placeholder="Migrated Project" value="Migrated Project" />
+      </div>
+
+      <div class="field-block">
+        <label class="field-label">Copy Strategy</label>
+        <select id="copyModeSelect">
+          <option value="folder">Package into Folder and Copy (Recommended)</option>
+          <option value="individual">Copy Designs Individually</option>
+        </select>
+      </div>
+
+      <div class="field-block" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <label class="field-label" style="margin:0;">Live Activity Console</label>
+        <span id="clearLogBtn" style="cursor:pointer;color:var(--cyan-bright);font-size:11px;font-weight:600;">Clear Logs</span>
+      </div>
+      <div class="terminal-box" id="logBox">
+        <div class="log-line">Ready. Listening for Canva workspace signals...</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
